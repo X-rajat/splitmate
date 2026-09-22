@@ -19,6 +19,7 @@ fun SignUpScreen(
     var email by remember { mutableStateOf("") }
     var mobile by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var signUpWithPhone by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(state) {
@@ -32,9 +33,26 @@ fun SignUpScreen(
 
         OutlinedTextField(name, { name = it }, label = { Text("Full name") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
         Spacer(Modifier.height(12.dp))
-        OutlinedTextField(email, { email = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            SegmentedButton(
+                selected = !signUpWithPhone,
+                onClick = { signUpWithPhone = false },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+            ) { Text("Email") }
+            SegmentedButton(
+                selected = signUpWithPhone,
+                onClick = { signUpWithPhone = true },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+            ) { Text("Phone") }
+        }
         Spacer(Modifier.height(12.dp))
-        OutlinedTextField(mobile, { mobile = it }, label = { Text("Mobile number (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+
+        if (signUpWithPhone) {
+            OutlinedTextField(mobile, { mobile = it }, label = { Text("Mobile number") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        } else {
+            OutlinedTextField(email, { email = it }, label = { Text("Email") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+        }
         Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             password, { password = it }, label = { Text("Password") },

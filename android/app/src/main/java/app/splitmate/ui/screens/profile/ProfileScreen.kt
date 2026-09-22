@@ -19,7 +19,7 @@ fun ProfileScreen(onLoggedOut: () -> Unit, viewModel: ProfileViewModel = hiltVie
         Column(Modifier.fillMaxSize().padding(padding).padding(24.dp)) {
             user?.let {
                 Text(it.name, style = MaterialTheme.typography.headlineSmall)
-                Text(it.email, style = MaterialTheme.typography.bodyMedium)
+                it.email?.let { e -> Text(e, style = MaterialTheme.typography.bodyMedium) }
                 it.mobile?.let { m -> Text(m, style = MaterialTheme.typography.bodyMedium) }
                 Spacer(Modifier.height(8.dp))
                 Text("Default currency: ${it.default_currency}", style = MaterialTheme.typography.bodySmall)

@@ -34,7 +34,7 @@ class User(TimestampMixin, Base):
 
     id: Mapped[uuid.UUID] = _uuid_col(primary_key=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
     mobile: Mapped[str | None] = mapped_column(String(20), unique=True, index=True, nullable=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     profile_photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)

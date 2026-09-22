@@ -39,14 +39,14 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
     }
 
     fun register(name: String, email: String, mobile: String, password: String) {
-        if (name.isBlank() || email.isBlank() || password.length < 8) {
-            _state.value = AuthUiState.Error("Fill all fields; password needs 8+ characters")
+        if (name.isBlank() || (email.isBlank() && mobile.isBlank()) || password.length < 8) {
+            _state.value = AuthUiState.Error("Enter your name, an email or mobile number, and a password with 8+ characters")
             return
         }
         _state.value = AuthUiState.Loading
         viewModelScope.launch {
             _state.value = try {
-                authRepository.register(name, email, mobile.ifBlank { null }, password)
+                authRepository.register(name, email.ifBlank { null }, mobile.ifBlank { null }, password)
                 AuthUiState.Success
             } catch (e: Exception) {
                 AuthUiState.Error(e.message ?: "Registration failed")

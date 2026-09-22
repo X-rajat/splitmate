@@ -19,9 +19,10 @@ router = APIRouter(prefix="/auth", tags=["auth"], dependencies=[Depends(rate_lim
 
 @router.post("/register", response_model=TokenPair, status_code=status.HTTP_201_CREATED)
 def register(payload: RegisterRequest, db: Session = Depends(get_db)):
-    exists = db.query(User).filter(User.email == payload.email).first()
-    if exists:
-        raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
+    if payload.email:
+        exists = db.query(User).filter(User.email == payload.email).first()
+        if exists:
+            raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
     if payload.mobile:
         mobile_exists = db.query(User).filter(User.mobile == payload.mobile).first()
         if mobile_exists:

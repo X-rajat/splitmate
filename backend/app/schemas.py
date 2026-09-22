@@ -2,16 +2,22 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, model_validator
 
 
 # ---- Auth ----
 
 class RegisterRequest(BaseModel):
     name: str = Field(min_length=1, max_length=120)
-    email: EmailStr
+    email: Optional[EmailStr] = None
     mobile: Optional[str] = Field(default=None, max_length=20)
     password: str = Field(min_length=8, max_length=128)
+
+    @model_validator(mode="after")
+    def require_email_or_mobile(self) -> "RegisterRequest":
+        if not self.email and not self.mobile:
+            raise ValueError("Provide either an email or a mobile number")
+        return self
 
 
 class LoginRequest(BaseModel):
@@ -32,7 +38,7 @@ class RefreshRequest(BaseModel):
 class UserOut(BaseModel):
     id: uuid.UUID
     name: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
     mobile: Optional[str] = None
     profile_photo_url: Optional[str] = None
     default_currency: str

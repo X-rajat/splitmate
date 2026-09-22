@@ -1,6 +1,6 @@
 package app.splitmate.data.remote.dto
 
-data class RegisterRequest(val name: String, val email: String, val mobile: String?, val password: String)
+data class RegisterRequest(val name: String, val email: String?, val mobile: String?, val password: String)
 data class LoginRequest(val identifier: String, val password: String)
 data class RefreshRequest(val refresh_token: String)
 data class TokenPairDto(val access_token: String, val refresh_token: String, val token_type: String)
@@ -8,7 +8,7 @@ data class TokenPairDto(val access_token: String, val refresh_token: String, val
 data class UserDto(
     val id: String,
     val name: String,
-    val email: String,
+    val email: String?,
     val mobile: String?,
     val profile_photo_url: String?,
     val default_currency: String,

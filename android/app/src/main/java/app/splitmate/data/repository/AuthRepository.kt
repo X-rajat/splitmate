@@ -13,7 +13,7 @@ class AuthRepository @Inject constructor(
     private val api: ApiService,
     private val tokenStore: TokenStore,
 ) {
-    suspend fun register(name: String, email: String, mobile: String?, password: String) {
+    suspend fun register(name: String, email: String?, mobile: String?, password: String) {
         val tokens = api.register(RegisterRequest(name, email, mobile, password))
         tokenStore.saveTokens(tokens.access_token, tokens.refresh_token)
     }

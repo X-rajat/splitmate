@@ -52,7 +52,7 @@ private fun FriendRow(user: UserDto) {
     Card {
         Column(Modifier.fillMaxWidth().padding(12.dp)) {
             Text(user.name, style = MaterialTheme.typography.titleSmall)
-            Text(user.email, style = MaterialTheme.typography.bodySmall)
+            Text(user.email ?: user.mobile.orEmpty(), style = MaterialTheme.typography.bodySmall)
         }
     }
 }
