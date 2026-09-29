@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="480" viewBox="0 0 1000 480" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5B6B66"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="480" fill="#FBFDFA"/>
+
+  <!-- Android app -->
+  <rect x="40" y="60" width="220" height="150" rx="18" fill="#CDEEE3" stroke="#0F6B5C" stroke-width="1.5"/>
+  <text x="150" y="105" text-anchor="middle" font-size="18" font-weight="700" fill="#00201A">Android App</text>
+  <text x="150" y="130" text-anchor="middle" font-size="13" fill="#0F6B5C">Kotlin · Compose · Hilt</text>
+  <text x="150" y="150" text-anchor="middle" font-size="13" fill="#0F6B5C">Room (offline cache)</text>
+  <text x="150" y="170" text-anchor="middle" font-size="13" fill="#0F6B5C">Retrofit + OkHttp</text>
+  <text x="150" y="190" text-anchor="middle" font-size="12" fill="#3C5B54">App Links: splitmate.app/join/*</text>
+
+  <!-- Arrow app -> api -->
+  <line x1="260" y1="135" x2="380" y2="135" stroke="#5B6B66" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="320" y="122" text-anchor="middle" font-size="12" fill="#5B6B66">HTTPS / JWT</text>
+
+  <!-- FastAPI backend -->
+  <rect x="380" y="40" width="240" height="190" rx="18" fill="#FFE0B2" stroke="#B6720A" stroke-width="1.5"/>
+  <text x="500" y="80" text-anchor="middle" font-size="18" font-weight="700" fill="#2A1800">FastAPI Backend</text>
+  <text x="500" y="105" text-anchor="middle" font-size="13" fill="#8A5A06">Auth · Groups · Expenses</text>
+  <text x="500" y="125" text-anchor="middle" font-size="13" fill="#8A5A06">Balance engine (exact int math)</text>
+  <text x="500" y="145" text-anchor="middle" font-size="13" fill="#8A5A06">Debt simplification</text>
+  <text x="500" y="165" text-anchor="middle" font-size="13" fill="#8A5A06">Settlements · Friends</text>
+  <text x="500" y="185" text-anchor="middle" font-size="13" fill="#8A5A06">Notifications · Analytics</text>
+  <text x="500" y="210" text-anchor="middle" font-size="12" fill="#5B4A2E">SQLAlchemy + Alembic</text>
+
+  <!-- Arrow api -> db -->
+  <line x1="500" y1="230" x2="500" y2="290" stroke="#5B6B66" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Postgres -->
+  <rect x="380" y="290" width="150" height="90" rx="18" fill="#E7F0EC" stroke="#0F6B5C" stroke-width="1.5"/>
+  <text x="455" y="325" text-anchor="middle" font-size="16" font-weight="700" fill="#0F6B5C">PostgreSQL</text>
+  <text x="455" y="348" text-anchor="middle" font-size="12" fill="#3C5B54">13 tables, UUID PKs</text>
+  <text x="455" y="366" text-anchor="middle" font-size="12" fill="#3C5B54">Integer minor-unit money</text>
+
+  <!-- Redis -->
+  <rect x="550" y="290" width="150" height="90" rx="18" fill="#FBE2E1" stroke="#C5433F" stroke-width="1.5"/>
+  <text x="625" y="325" text-anchor="middle" font-size="16" font-weight="700" fill="#7A2A27">Redis</text>
+  <text x="625" y="348" text-anchor="middle" font-size="12" fill="#7A2A27">Rate limiting</text>
+  <text x="625" y="366" text-anchor="middle" font-size="12" fill="#7A2A27">Caching (future)</text>
+
+  <!-- Docker compose box -->
+  <rect x="360" y="270" width="360" height="130" rx="20" fill="none" stroke="#9AA6A1" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text x="540" y="415" text-anchor="middle" font-size="13" fill="#5B6B66">docker compose up -d</text>
+
+  <!-- External: invite share -->
+  <rect x="760" y="60" width="200" height="110" rx="18" fill="#E7F0EC" stroke="#7B8B85" stroke-width="1.5"/>
+  <text x="860" y="95" text-anchor="middle" font-size="15" font-weight="700" fill="#26332F">Share sheet</text>
+  <text x="860" y="118" text-anchor="middle" font-size="12" fill="#4A5B55">WhatsApp · SMS · Email</text>
+  <text x="860" y="138" text-anchor="middle" font-size="12" fill="#4A5B55">invite link -&gt; deep link</text>
+  <line x1="620" y1="115" x2="760" y2="115" stroke="#5B6B66" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>

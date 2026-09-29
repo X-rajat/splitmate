@@ -1,4 +1,14 @@
-# SplitMate
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="SplitMate — split bills, settle up, stay friends" width="100%" />
+</p>
+
+<p align="center">
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-0F6B5C?style=flat-square" />
+  <img alt="Backend" src="https://img.shields.io/badge/backend-FastAPI%20%2B%20PostgreSQL-0F6B5C?style=flat-square" />
+  <img alt="Android" src="https://img.shields.io/badge/android-Kotlin%20%2B%20Compose-B6720A?style=flat-square" />
+  <img alt="Tests" src="https://img.shields.io/badge/backend%20tests-27%20passing-1E8E5A?style=flat-square" />
+  <img alt="Min SDK" src="https://img.shields.io/badge/minSdk-26-6b6b6b?style=flat-square" />
+</p>
 
 An original, production-oriented expense-sharing app (Android + backend), inspired by
 Splitwise's core functionality but with entirely original branding, code, and design.
@@ -6,7 +16,22 @@ Splitwise's core functionality but with entirely original branding, code, and de
 would make renaming hard (Android `applicationId`/`app_name`, backend `app_name` config
 value, and repo name are the only three places it appears).
 
+## Screens
+
+<p align="center">
+  <img src="docs/assets/screens-preview.svg" alt="Home, group detail, and add-expense screens" width="100%" />
+</p>
+
+*These are design-system mockups built from the app's real colors, type scale, and
+layout — not live device screenshots (this environment has no GPU/emulator support to
+capture real ones). Build and run the app to see the actual screens; they follow this
+exact design.*
+
 ## Architecture
+
+<p align="center">
+  <img src="docs/assets/architecture.svg" alt="Architecture: Android app, FastAPI backend, PostgreSQL, Redis" width="100%" />
+</p>
 
 ```
 splitmate/

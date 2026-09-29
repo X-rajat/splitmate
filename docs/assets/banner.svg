@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B4F44"/>
+      <stop offset="55%" stop-color="#0F6B5C"/>
+      <stop offset="100%" stop-color="#B6720A"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="80%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="320" rx="28" fill="url(#bg)"/>
+  <rect width="1200" height="320" rx="28" fill="url(#glow)"/>
+
+  <!-- Mark: two overlapping circles, same glyph as the Android adaptive icon -->
+  <g transform="translate(90,110)">
+    <circle cx="40" cy="40" r="40" fill="#FFFFFF"/>
+    <circle cx="88" cy="88" r="40" fill="#F2A93B"/>
+  </g>
+
+  <text x="240" y="150" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#FFFFFF" letter-spacing="-1">SplitMate</text>
+  <text x="242" y="195" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="24" fill="#E8F5F1">Split bills. Settle up. Stay friends.</text>
+
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#DDEDE8">
+    <text x="242" y="235">Kotlin + Jetpack Compose  ·  FastAPI + PostgreSQL  ·  JWT auth  ·  Docker Compose</text>
+  </g>
+</svg>
