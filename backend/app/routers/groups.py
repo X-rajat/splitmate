@@ -8,7 +8,14 @@ from app.config import get_settings
 from app.database import get_db
 from app.deps import get_current_user, require_group_admin, require_group_member
 from app.models import Group, GroupMember, Invitation, User
-from app.schemas import GroupCreate, GroupOut, InvitationOut, JoinGroupResponse
+from app.schemas import (
+    GroupCreate,
+    GroupMemberOut,
+    GroupOut,
+    InvitationOut,
+    JoinGroupResponse,
+    PlaceholderMemberCreate,
+)
 from app.security import generate_invitation_token
 
 router = APIRouter(prefix="/groups", tags=["groups"])
@@ -78,6 +85,52 @@ def get_group(group_id: uuid.UUID, db: Session = Depends(get_db), user: User = D
     require_group_member(group_id, db, user)
     group = db.get(Group, group_id)
     return _group_out(db, group)
+
+
+@router.get("/{group_id}/members", response_model=list[GroupMemberOut])
+def list_members(group_id: uuid.UUID, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    require_group_member(group_id, db, user)
+    rows = (
+        db.query(GroupMember, User)
+        .join(User, User.id == GroupMember.user_id)
+        .filter(GroupMember.group_id == group_id, GroupMember.left_at.is_(None))
+        .all()
+    )
+    return [
+        GroupMemberOut(
+            user_id=member_user.id,
+            name=member_user.name,
+            email=member_user.email,
+            mobile=member_user.mobile,
+            is_placeholder=member_user.is_placeholder,
+            role=membership.role,
+        )
+        for membership, member_user in rows
+    ]
+
+
+@router.post("/{group_id}/members/placeholder", response_model=GroupMemberOut, status_code=status.HTTP_201_CREATED)
+def add_placeholder_member(
+    group_id: uuid.UUID,
+    payload: PlaceholderMemberCreate,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Adds a guest with no account: just a name, split into bills, settled on their
+    behalf by a real member. Any group member can add one (not just admins) - this
+    mirrors adding a friend by name when they aren't reachable to invite yet."""
+    require_group_member(group_id, db, user)
+
+    guest = User(name=payload.name, email=None, mobile=None, password_hash=None, is_placeholder=True)
+    db.add(guest)
+    db.flush()
+    db.add(GroupMember(group_id=group_id, user_id=guest.id, role="member"))
+    db.commit()
+    db.refresh(guest)
+
+    return GroupMemberOut(
+        user_id=guest.id, name=guest.name, email=None, mobile=None, is_placeholder=True, role="member"
+    )
 
 
 @router.post("/{group_id}/members", status_code=status.HTTP_201_CREATED)

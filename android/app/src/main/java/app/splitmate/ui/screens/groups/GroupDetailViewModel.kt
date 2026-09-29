@@ -69,4 +69,16 @@ class GroupDetailViewModel @Inject constructor(
             }
         }
     }
+
+    /** Adds someone to this group by name only - no signup needed - so future expenses can be split with them. */
+    fun addGuest(name: String) {
+        viewModelScope.launch {
+            try {
+                groupRepository.addPlaceholderMember(groupId, name)
+                refresh()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message ?: "Could not add guest")
+            }
+        }
+    }
 }

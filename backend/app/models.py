@@ -36,11 +36,16 @@ class User(TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str | None] = mapped_column(String(255), unique=True, index=True, nullable=True)
     mobile: Mapped[str | None] = mapped_column(String(20), unique=True, index=True, nullable=True)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
     profile_photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     default_currency: Mapped[str] = mapped_column(String(3), default="INR")
     notification_prefs: Mapped[str] = mapped_column(String(20), default="all")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # A placeholder/guest member: added to a group by another member so bills can be
+    # split with them, but has no email/mobile/password and can never log in. A real
+    # user account can later be linked to replace them (not implemented yet - see
+    # docs/superpowers plan for the Android member-picker work this supports).
+    is_placeholder: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class Friendship(TimestampMixin, Base):

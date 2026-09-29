@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.splitmate.data.remote.dto.ExpenseCreateRequest
 import app.splitmate.data.remote.dto.ExpensePaymentIn
+import app.splitmate.data.remote.dto.GroupMemberDto
 import app.splitmate.domain.balance.BalanceCalculator
 import app.splitmate.domain.balance.BalanceEngineException
 import app.splitmate.data.repository.ExpenseRepository
+import app.splitmate.data.repository.GroupRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,7 @@ data class AddExpenseUiState(
     val amountText: String = "",
     val category: String = "other",
     val splitType: String = "equal",
+    val members: List<GroupMemberDto> = emptyList(),
     val paidBy: String = "",
     val participantIds: Set<String> = emptySet(),
     val error: String? = null,
@@ -33,6 +36,7 @@ data class AddExpenseUiState(
 @HiltViewModel
 class AddExpenseViewModel @Inject constructor(
     private val expenseRepository: ExpenseRepository,
+    private val groupRepository: GroupRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -40,8 +44,31 @@ class AddExpenseViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddExpenseUiState())
     val uiState: StateFlow<AddExpenseUiState> = _uiState
 
+    init {
+        viewModelScope.launch {
+            val members = groupRepository.listMembers(groupId)
+            // Default to everyone in the split, paid by the first member, like Splitwise does.
+            update { it.copy(members = members, participantIds = members.map { m -> m.user_id }.toSet(), paidBy = members.firstOrNull()?.user_id.orEmpty()) }
+        }
+    }
+
     fun update(transform: (AddExpenseUiState) -> AddExpenseUiState) {
         _uiState.value = transform(_uiState.value)
+    }
+
+    fun toggleParticipant(userId: String) {
+        update {
+            val next = if (userId in it.participantIds) it.participantIds - userId else it.participantIds + userId
+            it.copy(participantIds = next)
+        }
+    }
+
+    fun addGuest(name: String) {
+        if (name.isBlank()) return
+        viewModelScope.launch {
+            val guest = groupRepository.addPlaceholderMember(groupId, name)
+            update { it.copy(members = it.members + guest, participantIds = it.participantIds + guest.user_id) }
+        }
     }
 
     fun submit() {

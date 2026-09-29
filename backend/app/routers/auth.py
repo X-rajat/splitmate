@@ -51,7 +51,9 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         .filter(or_(User.email == payload.identifier, User.mobile == payload.identifier))
         .first()
     )
-    if user is None or not verify_password(payload.password, user.password_hash):
+    if user is None or user.password_hash is None or not verify_password(payload.password, user.password_hash):
+        # Placeholder/guest accounts have no password_hash and can never log in;
+        # this returns the same generic error as a wrong password would.
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Invalid credentials")
     if not user.is_active:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Account disabled")

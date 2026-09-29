@@ -26,6 +26,12 @@ interface ApiService {
     @GET("groups/{id}")
     suspend fun getGroup(@Path("id") id: String): GroupDto
 
+    @GET("groups/{id}/members")
+    suspend fun listMembers(@Path("id") id: String): List<GroupMemberDto>
+
+    @POST("groups/{id}/members/placeholder")
+    suspend fun addPlaceholderMember(@Path("id") id: String, @Body body: PlaceholderMemberCreateRequest): GroupMemberDto
+
     @POST("groups/{id}/invite")
     suspend fun createInvitation(@Path("id") id: String): InvitationDto
 

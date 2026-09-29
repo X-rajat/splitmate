@@ -41,6 +41,17 @@ data class InvitationDto(
 
 data class JoinGroupResponse(val group: GroupDto, val already_member: Boolean)
 
+data class GroupMemberDto(
+    val user_id: String,
+    val name: String,
+    val email: String?,
+    val mobile: String?,
+    val is_placeholder: Boolean,
+    val role: String,
+)
+
+data class PlaceholderMemberCreateRequest(val name: String)
+
 data class ExpenseParticipantIn(
     val user_id: String,
     val amount_minor: Long? = null,
@@ -93,6 +104,7 @@ data class SettlementCreateRequest(
     val method: String,
     val upi_id: String? = null,
     val note: String? = null,
+    val from_user_id: String? = null,
 )
 
 data class SettlementDto(

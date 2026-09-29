@@ -5,8 +5,10 @@ import app.splitmate.data.local.entities.GroupEntity
 import app.splitmate.data.remote.ApiService
 import app.splitmate.data.remote.dto.GroupCreateRequest
 import app.splitmate.data.remote.dto.GroupDto
+import app.splitmate.data.remote.dto.GroupMemberDto
 import app.splitmate.data.remote.dto.InvitationDto
 import app.splitmate.data.remote.dto.JoinGroupResponse
+import app.splitmate.data.remote.dto.PlaceholderMemberCreateRequest
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,4 +41,11 @@ class GroupRepository @Inject constructor(
     suspend fun createInvitation(groupId: String): InvitationDto = api.createInvitation(groupId)
 
     suspend fun joinGroup(token: String): JoinGroupResponse = api.joinGroup(token)
+
+    /** Real member names for pickers (payer / split-between), including placeholder guests. */
+    suspend fun listMembers(groupId: String): List<GroupMemberDto> = api.listMembers(groupId)
+
+    /** Adds a guest with just a name - no account, no signup - so bills can be split with them. */
+    suspend fun addPlaceholderMember(groupId: String, name: String): GroupMemberDto =
+        api.addPlaceholderMember(groupId, PlaceholderMemberCreateRequest(name))
 }

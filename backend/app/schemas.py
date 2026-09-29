@@ -42,6 +42,7 @@ class UserOut(BaseModel):
     mobile: Optional[str] = None
     profile_photo_url: Optional[str] = None
     default_currency: str
+    is_placeholder: bool = False
 
     class Config:
         from_attributes = True
@@ -55,6 +56,22 @@ class GroupCreate(BaseModel):
     icon_url: Optional[str] = None
     currency: str = "INR"
     member_ids: list[uuid.UUID] = []
+
+
+class PlaceholderMemberCreate(BaseModel):
+    """Adds a guest to a group with no account of their own - just a name to split
+    bills against. They can never log in (no email/mobile/password); another member
+    records any settlement on their behalf. See User.is_placeholder."""
+    name: str = Field(min_length=1, max_length=120)
+
+
+class GroupMemberOut(BaseModel):
+    user_id: uuid.UUID
+    name: str
+    email: Optional[EmailStr] = None
+    mobile: Optional[str] = None
+    is_placeholder: bool
+    role: str
 
 
 class GroupOut(BaseModel):
@@ -148,6 +165,10 @@ class SettlementCreate(BaseModel):
     method: str = "cash"
     upi_id: Optional[str] = None
     note: Optional[str] = None
+    # Who paid. Defaults to the caller (self-settling). Set this to record a payment
+    # on behalf of someone else - only allowed when that person is a placeholder
+    # guest (who can't log in to record it themselves) or the caller is a group admin.
+    from_user_id: Optional[uuid.UUID] = None
 
 
 class SettlementOut(BaseModel):
