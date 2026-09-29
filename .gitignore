@@ -17,6 +17,8 @@ android/.idea/
 .DS_Store
 local.properties
 
-# APK output (kept out of git; produced by CI or local build)
+# APK/AAB build output is kept out of git by default (produced by CI or a local
+# build), except the one debug APK intentionally published for download below.
 *.apk
 *.aab
+!releases/*.apk

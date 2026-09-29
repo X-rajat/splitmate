@@ -10,6 +10,11 @@
   <img alt="Min SDK" src="https://img.shields.io/badge/minSdk-26-6b6b6b?style=flat-square" />
 </p>
 
+<p align="center">
+  <a href="releases/SplitMate-debug.apk"><strong>⬇ Download the debug APK</strong></a>
+  &nbsp;·&nbsp; package <code>app.splitmate.debug</code>, minSdk 26, targets the hosted backend out of the box
+</p>
+
 An original, production-oriented expense-sharing app (Android + backend), inspired by
 Splitwise's core functionality but with entirely original branding, code, and design.
 "SplitMate" is a placeholder name; the architecture doesn't hardcode it anywhere that
