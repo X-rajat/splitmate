@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import com.google.gson.Gson
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -15,6 +16,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.content.Context
 import app.splitmate.data.remote.ApiService
+import app.splitmate.data.remote.TokenAuthenticator
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -37,15 +40,34 @@ object NetworkModule {
         chain.proceed(request)
     }
 
+    private fun loggingInterceptor() = HttpLoggingInterceptor().apply {
+        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+    }
+
+    /** No auth header, no authenticator - used only by [TokenAuthenticator] to call
+     * auth/refresh itself, so refreshing a token can never recursively trigger another
+     * 401-refresh cycle against itself. */
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: Interceptor): OkHttpClient {
-        val logging = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
-        }
+    @Named("plain")
+    fun providePlainOkHttpClient(): OkHttpClient =
+        OkHttpClient.Builder().addInterceptor(loggingInterceptor()).build()
+
+    @Provides
+    @Singleton
+    fun provideTokenAuthenticator(
+        tokenStore: TokenStore,
+        gson: Gson,
+        @Named("plain") plainClient: OkHttpClient,
+    ): TokenAuthenticator = TokenAuthenticator(tokenStore, gson, plainClient)
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: Interceptor, authenticator: TokenAuthenticator): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
-            .addInterceptor(logging)
+            .authenticator(authenticator)
+            .addInterceptor(loggingInterceptor())
             .build()
     }
 

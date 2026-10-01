@@ -13,6 +13,7 @@ import javax.inject.Inject
 data class FriendsUiState(
     val friends: List<UserDto> = emptyList(),
     val searchResults: List<UserDto> = emptyList(),
+    val error: String? = null,
 )
 
 @HiltViewModel
@@ -21,17 +22,33 @@ class FriendsViewModel @Inject constructor(private val friendRepository: FriendR
     val uiState: StateFlow<FriendsUiState> = _uiState
 
     init {
-        viewModelScope.launch { _uiState.value = _uiState.value.copy(friends = friendRepository.listFriends()) }
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(friends = friendRepository.listFriends())
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = "Could not load friends: ${e.message ?: "unknown error"}")
+            }
+        }
     }
 
     fun search(query: String) {
         viewModelScope.launch {
-            val results = if (query.length >= 2) friendRepository.search(query) else emptyList()
-            _uiState.value = _uiState.value.copy(searchResults = results)
+            try {
+                val results = if (query.length >= 2) friendRepository.search(query) else emptyList()
+                _uiState.value = _uiState.value.copy(searchResults = results, error = null)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = "Search failed: ${e.message ?: "unknown error"}")
+            }
         }
     }
 
     fun sendRequest(userId: String) {
-        viewModelScope.launch { friendRepository.sendRequest(userId) }
+        viewModelScope.launch {
+            try {
+                friendRepository.sendRequest(userId)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = "Could not send request: ${e.message ?: "unknown error"}")
+            }
+        }
     }
 }

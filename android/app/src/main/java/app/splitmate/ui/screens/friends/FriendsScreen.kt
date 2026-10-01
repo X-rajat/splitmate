@@ -25,6 +25,10 @@ fun FriendsScreen(viewModel: FriendsViewModel = hiltViewModel()) {
                 label = { Text("Search users by name or email") },
                 modifier = Modifier.fillMaxWidth(),
             )
+            if (state.error != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(state.error!!, color = MaterialTheme.colorScheme.error)
+            }
             Spacer(Modifier.height(12.dp))
             if (state.searchResults.isNotEmpty()) {
                 Text("Results", style = MaterialTheme.typography.titleSmall)

@@ -45,10 +45,24 @@ class AddExpenseViewModel @Inject constructor(
     val uiState: StateFlow<AddExpenseUiState> = _uiState
 
     init {
+        loadMembers()
+    }
+
+    private fun loadMembers() {
         viewModelScope.launch {
-            val members = groupRepository.listMembers(groupId)
-            // Default to everyone in the split, paid by the first member, like Splitwise does.
-            update { it.copy(members = members, participantIds = members.map { m -> m.user_id }.toSet(), paidBy = members.firstOrNull()?.user_id.orEmpty()) }
+            try {
+                val members = groupRepository.listMembers(groupId)
+                // Default to everyone in the split, paid by the first member, like Splitwise does.
+                update {
+                    it.copy(
+                        members = members,
+                        participantIds = members.map { m -> m.user_id }.toSet(),
+                        paidBy = members.firstOrNull()?.user_id.orEmpty(),
+                    )
+                }
+            } catch (e: Exception) {
+                update { it.copy(error = "Could not load group members: ${e.message ?: "unknown error"}") }
+            }
         }
     }
 
@@ -66,14 +80,24 @@ class AddExpenseViewModel @Inject constructor(
     fun addGuest(name: String) {
         if (name.isBlank()) return
         viewModelScope.launch {
-            val guest = groupRepository.addPlaceholderMember(groupId, name)
-            update { it.copy(members = it.members + guest, participantIds = it.participantIds + guest.user_id) }
+            try {
+                val guest = groupRepository.addPlaceholderMember(groupId, name)
+                update { it.copy(members = it.members + guest, participantIds = it.participantIds + guest.user_id, error = null) }
+            } catch (e: Exception) {
+                update { it.copy(error = "Could not add guest: ${e.message ?: "unknown error"}") }
+            }
         }
     }
 
     fun submit() {
         val s = _uiState.value
-        val amountMinor = (s.amountText.toDoubleOrNull()?.times(100))?.toLong()
+        // Parse via BigDecimal, not Double*100, so "19.99" can't become 1998 paise
+        // instead of 1999 from binary floating-point rounding.
+        val amountMinor = try {
+            s.amountText.trim().toBigDecimal().movePointRight(2).longValueExact()
+        } catch (e: Exception) {
+            null
+        }
         if (amountMinor == null || amountMinor <= 0) {
             update { it.copy(error = "Enter a valid amount") }
             return
@@ -89,6 +113,11 @@ class AddExpenseViewModel @Inject constructor(
             return
         }
 
+        if (s.description.isBlank()) {
+            update { it.copy(error = "Enter a description") }
+            return
+        }
+
         viewModelScope.launch {
             val request = ExpenseCreateRequest(
                 description = s.description,
@@ -99,8 +128,14 @@ class AddExpenseViewModel @Inject constructor(
                 participant_ids = s.participantIds.toList(),
                 payments = listOf(ExpensePaymentIn(s.paidBy, amountMinor)),
             )
-            val synced = expenseRepository.createExpense(groupId, request)
-            update { it.copy(success = true, savedOffline = !synced, error = null) }
+            try {
+                val synced = expenseRepository.createExpense(groupId, request)
+                update { it.copy(success = true, savedOffline = !synced, error = null) }
+            } catch (e: Exception) {
+                // A real server rejection (e.g. 401/422/500) - not an offline/IOException,
+                // which ExpenseRepository already handles by queuing for later sync.
+                update { it.copy(error = "Could not save expense: ${e.message ?: "unknown error"}") }
+            }
         }
     }
 }

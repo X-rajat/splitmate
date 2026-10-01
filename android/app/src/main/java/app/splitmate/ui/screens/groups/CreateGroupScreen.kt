@@ -19,11 +19,17 @@ import javax.inject.Inject
 class CreateGroupViewModel @Inject constructor(private val groupRepository: GroupRepository) : ViewModel() {
     private val _created = MutableStateFlow<String?>(null)
     val created: StateFlow<String?> = _created
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
 
     fun create(name: String, description: String, currency: String) {
         viewModelScope.launch {
-            val group = groupRepository.createGroup(name, description.ifBlank { null }, currency, emptyList())
-            _created.value = group.id
+            try {
+                val group = groupRepository.createGroup(name, description.ifBlank { null }, currency, emptyList())
+                _created.value = group.id
+            } catch (e: Exception) {
+                _error.value = "Could not create group: ${e.message ?: "unknown error"}"
+            }
         }
     }
 }
@@ -38,6 +44,7 @@ fun CreateGroupScreen(onCreated: (String) -> Unit, viewModel: CreateGroupViewMod
     var currency by remember { mutableStateOf("INR") }
     var expanded by remember { mutableStateOf(false) }
     val created by viewModel.created.collectAsState()
+    val error by viewModel.error.collectAsState()
 
     LaunchedEffect(created) { created?.let(onCreated) }
 
@@ -58,6 +65,10 @@ fun CreateGroupScreen(onCreated: (String) -> Unit, viewModel: CreateGroupViewMod
                     DropdownMenuItem(text = { Text(c) }, onClick = { currency = c; expanded = false })
                 }
             }
+        }
+        if (error != null) {
+            Spacer(Modifier.height(8.dp))
+            Text(error!!, color = MaterialTheme.colorScheme.error)
         }
         Spacer(Modifier.height(24.dp))
         Button(onClick = { viewModel.create(name, description, currency) }, enabled = name.isNotBlank(), modifier = Modifier.fillMaxWidth()) {
