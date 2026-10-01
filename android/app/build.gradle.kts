@@ -19,7 +19,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_BASE_URL", "\"https://backend-production-cae14.up.railway.app/\"")
+        buildConfigField("String", "API_BASE_URL", "\"https://splitmate-d8l5.onrender.com/\"")
     }
 
     buildTypes {
