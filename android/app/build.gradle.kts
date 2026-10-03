@@ -22,6 +22,18 @@ android {
         buildConfigField("String", "API_BASE_URL", "\"https://splitmate-d8l5.onrender.com/\"")
     }
 
+    signingConfigs {
+        // Committed debug.keystore so every build (any machine, any CI run) signs debug/release
+        // builds identically - otherwise Gradle's implicit per-machine default debug keystore
+        // makes each build's APK un-upgradable over any install from a different machine.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         debug {
             isDebuggable = true
