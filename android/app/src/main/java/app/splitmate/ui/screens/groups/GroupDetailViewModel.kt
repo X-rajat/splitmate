@@ -70,6 +70,17 @@ class GroupDetailViewModel @Inject constructor(
         }
     }
 
+    fun deleteExpense(expenseId: String) {
+        viewModelScope.launch {
+            try {
+                expenseRepository.deleteExpense(groupId, expenseId)
+                refresh()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message ?: "Could not delete expense")
+            }
+        }
+    }
+
     /** Adds someone to this group by name only - no signup needed - so future expenses can be split with them. */
     fun addGuest(name: String) {
         viewModelScope.launch {

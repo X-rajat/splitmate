@@ -26,6 +26,10 @@ class ExpenseRepository @Inject constructor(
     fun observePendingCount(): Flow<Int> = pendingExpenseDao.observePendingCount()
 
     suspend fun refresh(groupId: String) {
+        // Opportunistically flush anything queued while the backend was unreachable
+        // (e.g. a Render cold start) before showing what's "current" - otherwise a
+        // pending expense can sit stuck indefinitely since nothing else calls this.
+        syncPendingExpenses()
         val expenses = api.listExpenses(groupId)
         expenseDao.upsertAll(
             expenses.map {
@@ -69,6 +73,11 @@ class ExpenseRepository @Inject constructor(
                 pendingExpenseDao.update(pending.copy(syncFailed = true))
             }
         }
+    }
+
+    suspend fun deleteExpense(groupId: String, expenseId: String) {
+        api.deleteExpense(groupId, expenseId)
+        expenseDao.deleteById(expenseId)
     }
 
     suspend fun getBalances(groupId: String): List<BalanceEntryDto> = api.getBalances(groupId)

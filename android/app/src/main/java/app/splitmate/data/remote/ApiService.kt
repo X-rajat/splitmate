@@ -44,6 +44,9 @@ interface ApiService {
     @POST("groups/{id}/expenses")
     suspend fun createExpense(@Path("id") id: String, @Body body: ExpenseCreateRequest): ExpenseDto
 
+    @DELETE("groups/{groupId}/expenses/{expenseId}")
+    suspend fun deleteExpense(@Path("groupId") groupId: String, @Path("expenseId") expenseId: String)
+
     @GET("groups/{id}/balances")
     suspend fun getBalances(@Path("id") id: String): List<BalanceEntryDto>
 

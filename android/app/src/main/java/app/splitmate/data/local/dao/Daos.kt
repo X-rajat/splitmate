@@ -28,6 +28,9 @@ interface ExpenseDao {
 
     @Query("DELETE FROM cached_expenses WHERE groupId = :groupId")
     suspend fun clearForGroup(groupId: String)
+
+    @Query("DELETE FROM cached_expenses WHERE id = :expenseId")
+    suspend fun deleteById(expenseId: String)
 }
 
 @Dao

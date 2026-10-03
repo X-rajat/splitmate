@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Share
@@ -40,6 +41,21 @@ fun GroupDetailScreen(
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     var showAddGuest by remember { mutableStateOf(false) }
+    var expenseToDelete by remember { mutableStateOf<ExpenseEntity?>(null) }
+
+    expenseToDelete?.let { expense ->
+        AlertDialog(
+            onDismissRequest = { expenseToDelete = null },
+            title = { Text("Delete expense?") },
+            text = { Text("\"${expense.description}\" will be removed and balances will be recalculated. This can't be undone.") },
+            confirmButton = {
+                TextButton(onClick = { viewModel.deleteExpense(expense.id); expenseToDelete = null }) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { expenseToDelete = null }) { Text("Cancel") } },
+        )
+    }
 
     if (showAddGuest) {
         AddGuestDialog(
@@ -102,7 +118,9 @@ fun GroupDetailScreen(
             if (state.expenses.isEmpty()) {
                 item { EmptyExpensesState(onAddExpense) }
             } else {
-                items(state.expenses, key = { it.id }) { ExpenseRow(it) }
+                items(state.expenses, key = { it.id }) { expense ->
+                    ExpenseRow(expense, onDelete = { expenseToDelete = expense })
+                }
             }
 
             item { Spacer(Modifier.height(72.dp)) }
@@ -175,7 +193,7 @@ private fun SettlementRow(s: SettlementSuggestionDto) {
 }
 
 @Composable
-private fun ExpenseRow(e: ExpenseEntity) {
+private fun ExpenseRow(e: ExpenseEntity, onDelete: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -202,6 +220,14 @@ private fun ExpenseRow(e: ExpenseEntity) {
                 )
             }
             Text(BalanceCalculator.formatMajorUnits(e.amountMinor), fontWeight = FontWeight.SemiBold)
+            IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                Icon(
+                    Icons.Filled.Delete,
+                    contentDescription = "Delete \"${e.description}\"",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
     }
 }

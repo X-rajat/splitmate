@@ -15,6 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.content.Context
+import java.util.concurrent.TimeUnit
 import app.splitmate.data.remote.ApiService
 import app.splitmate.data.remote.TokenAuthenticator
 import javax.inject.Named
@@ -44,6 +45,16 @@ object NetworkModule {
         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
     }
 
+    /** The Render free-tier backend spins down after 15 minutes idle and takes ~30s to
+     * wake on the next request - OkHttp's 10s default timeout fires before that finishes,
+     * so a routine cold start was being misread as a network failure. */
+    private const val TIMEOUT_SECONDS = 40L
+
+    private fun OkHttpClient.Builder.withBackendTimeouts(): OkHttpClient.Builder = this
+        .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+
     /** No auth header, no authenticator - used only by [TokenAuthenticator] to call
      * auth/refresh itself, so refreshing a token can never recursively trigger another
      * 401-refresh cycle against itself. */
@@ -51,7 +62,7 @@ object NetworkModule {
     @Singleton
     @Named("plain")
     fun providePlainOkHttpClient(): OkHttpClient =
-        OkHttpClient.Builder().addInterceptor(loggingInterceptor()).build()
+        OkHttpClient.Builder().addInterceptor(loggingInterceptor()).withBackendTimeouts().build()
 
     @Provides
     @Singleton
@@ -68,6 +79,7 @@ object NetworkModule {
             .addInterceptor(authInterceptor)
             .authenticator(authenticator)
             .addInterceptor(loggingInterceptor())
+            .withBackendTimeouts()
             .build()
     }
 
