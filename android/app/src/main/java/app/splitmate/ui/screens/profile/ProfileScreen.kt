@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import app.splitmate.BuildConfig
 import app.splitmate.ui.theme.SplitMateAmber
 import app.splitmate.ui.theme.SplitMateTeal
 
@@ -107,6 +108,13 @@ fun ProfileScreen(onLoggedOut: () -> Unit, viewModel: ProfileViewModel = hiltVie
                 Text("Log out", style = MaterialTheme.typography.titleSmall)
             }
             Spacer(Modifier.height(4.dp))
+            Text(
+                "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
         }
     }
 }
